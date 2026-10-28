@@ -16,7 +16,7 @@
   },
   "type": "module",
   "license": "MPL-2.0",
-  "author": "jiwangyihao",
+  "author": "chrisb09",
   "keywords": [
     "opencode",
     "wait",
@@ -34,7 +34,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "test": "npm run build && npm run test:built",
-    "test:built": "node --test test/wait-tool.test.js test/plugin-entry.test.js",
+    "test:built": "node --test test/wait-tool.test.js test/plugin-entry.test.js test/wait-features.test.js",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
@@ -46,10 +46,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jiwangyihao/opencode-wait.git"
+    "url": "git+https://github.com/chrisb09/opencode-wait.git"
   },
   "bugs": {
-    "url": "https://github.com/jiwangyihao/opencode-wait/issues"
+    "url": "https://github.com/chrisb09/opencode-wait/issues"
   },
-  "homepage": "https://github.com/jiwangyihao/opencode-wait#readme"
+  "homepage": "https://github.com/chrisb09/opencode-wait#readme"
 }

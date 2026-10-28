@@ -1,8 +1,8 @@
-# 发布流程
+# Publishing Guide
 
-## 手动首发
+## Manual First Publish
 
-`opencode-wait` 第一次发布到 npm 时，需要先使用本地 npm 账号完成手动发布：
+To publish `opencode-wait` to npm manually:
 
 ```bash
 npm install
@@ -10,30 +10,27 @@ npm test
 npm publish --access public
 ```
 
-发布前必须确认：
+Before publishing, verify:
 
-- `npm test` 通过。
-- `npm pack --dry-run` 只包含 `dist/`、`README.md`、`LICENSE` 和 `package.json` 中声明的发布文件。
-- `package.json` 的 `repository.url` 指向 `git+https://github.com/jiwangyihao/opencode-wait.git`。
+- `npm test` passes.
+- `npm pack --dry-run` contains only `dist/`, `README.md`, `LICENSE`, and declared files.
+- `package.json` repository URL points to your fork repository.
 
-## 后续 GitHub Actions 发布
+## GitHub Actions Automated Release
 
-仓库使用 `.github/workflows/release.yml`。当 GitHub Release 发布后，workflow 会：
+When a GitHub Release is published, the workflow in `.github/workflows/release.yml`:
 
-1. 检出代码。
-2. 使用 Node.js 24。
-3. 升级到支持 Trusted Publishing 的新版 npm。
-4. 运行 `npm ci`、`npm run build` 和 `npm run test:built`。
-5. 如果当前版本还没发布，则通过 npm Trusted Publishing (OIDC) 执行 `npm publish --access public`。
+1. Checks out the repository.
+2. Sets up Node.js 24.
+3. Upgrades npm to support Trusted Publishing.
+4. Runs `npm ci`, `npm run build`, and `npm run test:built`.
+5. Publishes via npm Trusted Publishing (OIDC) if the version is not yet published.
 
-## npm Trusted Publishing 设置
+## npm Trusted Publishing Setup
 
-手动首发后，在 npmjs.com 的 `opencode-wait` 包设置中添加 Trusted Publisher：
+In your package settings on npmjs.com, configure Trusted Publisher:
 
-- Provider: GitHub Actions
-- Organization or user: `jiwangyihao`
-- Repository: `opencode-wait`
-- Workflow filename: `release.yml`
-- Environment name: 留空
-
-npm 官方要求 Trusted Publishing 使用 npm CLI 11.5.1 或更高版本、Node.js 22.14.0 或更高版本，并且 GitHub Actions workflow 必须授予 `id-token: write` 权限。
+- **Provider**: GitHub Actions
+- **Repository**: `<your-github-username>/opencode-wait`
+- **Workflow filename**: `release.yml`
+- **Environment name**: (leave blank)
