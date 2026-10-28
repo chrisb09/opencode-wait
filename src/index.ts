@@ -1,7 +1,7 @@
 import type { Plugin } from "@opencode-ai/plugin"
 import { createWaitTool, type WaitToolInput, type UserMessageObservation } from "./wait-tool.js"
 
-const WAIT_TOOL_DESCRIPTION = "Use for unattended/background waits that do not require user confirmation, including long-running tasks, Slurm jobs, external jobs, cooldowns, or expected notifications. Supports HTTP wake-up port, completion file, or user message."
+const WAIT_TOOL_DESCRIPTION = "Use for unattended/background waits (Slurm jobs, background processes, cooldowns) with 0% CPU. Can be woken up by external programs in two ways: 1) HTTP signal: an external job runs 'curl -s http://<host>:<port>/wake?token=<sessionID>&exitCode=0' (port defaults to 40000 + hash(sessionID) % 4096, and connection details are written to .opencode/wait-<sessionID>.json during wait). 2) Sentinel file: pass file: 'job.done' and have the job run 'echo $? > job.done' upon completion. Also ends on user message, context cancellation, or seconds timeout."
 
 const sessionMessageListeners = new Map<string, Set<(msg: UserMessageObservation) => void>>()
 

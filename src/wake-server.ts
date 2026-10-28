@@ -209,6 +209,7 @@ export async function startWakeServer(options: WakeServerOptions): Promise<WakeS
           token: sessionID,
           pid: process.pid,
           url: `http://${host}:${boundPort}/wake?token=${encodeURIComponent(sessionID)}`,
+          curl: `curl -s "http://${host}:${boundPort}/wake?token=${encodeURIComponent(sessionID)}"`,
           started: new Date().toISOString(),
         },
         null,

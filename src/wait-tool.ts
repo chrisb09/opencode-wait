@@ -337,13 +337,13 @@ export function createWaitTool(input: WaitToolInput = {}) {
   const defaultEnablePort = input.enablePort
 
   return tool({
-    description: "Use for unattended/background waits that do not require user confirmation, including long-running tasks, Slurm jobs, cooldowns, or expected notifications. Can be signaled to wake up via HTTP port (default 40000 + hash(sessionID)), completion file, or user message.",
+    description: "Use for unattended/background waits that do not require user confirmation (Slurm jobs, background processes, cooldowns) with 0% CPU. Can be woken up by external programs via: 1) HTTP signal: external jobs run 'curl -s http://<host>:<port>/wake?token=<sessionID>&exitCode=0' (port defaults to 40000 + hash(sessionID) % 4096; details written to .opencode/wait-<sessionID>.json). 2) Sentinel file: pass file: 'job.done' and have the job run 'echo $? > job.done' when finished. Also wakes on user message or timeout.",
     args: {
-      seconds: tool.schema.number().optional().describe("How long to wait in seconds. Positive values are honored as requested; missing, invalid, or non-positive values complete immediately."),
+      seconds: tool.schema.number().optional().describe("Maximum wait duration in seconds. Positive values are honored as requested; missing, invalid, or non-positive values complete immediately."),
       until: tool.schema.string().optional().describe("Event to wait for: 'new_user_message', 'port_signal', or 'file'."),
-      reason: tool.schema.string().optional().describe("Optional explanation of why the agent is waiting (shown in live progress and logs)."),
-      port: tool.schema.union([tool.schema.number(), tool.schema.literal("auto"), tool.schema.literal("off")]).optional().describe("HTTP wake-up port. Defaults to 'auto' (40000 + hash(sessionID) % 4096). Set to 'off' to disable."),
-      file: tool.schema.string().optional().describe("Optional path to a sentinel file to wait for (e.g. 'job.done'). If present, wait ends when the file appears."),
+      reason: tool.schema.string().optional().describe("Explanation of why the agent is waiting (shown in live progress and status)."),
+      port: tool.schema.union([tool.schema.number(), tool.schema.literal("auto"), tool.schema.literal("off")]).optional().describe("HTTP wake-up port. Defaults to 'auto' (40000 + hash(sessionID) % 4096). An external script or Slurm job wakes up the wait by running: curl -s 'http://<host>:<port>/wake?token=<sessionID>&exitCode=0' (details written to .opencode/wait-<sessionID>.json). Set to 'off' to disable."),
+      file: tool.schema.string().optional().describe("Path to a completion sentinel file (e.g. 'job.done'). Have your Slurm job run 'echo $? > job.done' upon finishing; the wait detects the file, reads its content, removes it, and returns immediately."),
       deleteFile: tool.schema.boolean().optional().describe("Whether to delete the sentinel file after detecting it. Defaults to true."),
       readContent: tool.schema.boolean().optional().describe("Whether to read and return the sentinel file content upon wake-up. Defaults to true."),
       pollIntervalSeconds: tool.schema.number().optional().describe("Check interval in seconds for file sentinel (defaults to 5s, keeps CPU at 0%)."),
@@ -416,6 +416,7 @@ export function createWaitTool(input: WaitToolInput = {}) {
             remainingMs,
             bar,
             port: wakeServer?.port,
+            wakeCommand: wakeServer ? `curl -s "http://${wakeServer.host}:${wakeServer.port}/wake?token=${wakeServer.token}"` : undefined,
           },
         })
       }
