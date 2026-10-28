@@ -5,7 +5,7 @@ const WAIT_TOOL_DESCRIPTION = "Use for unattended/background waits (Slurm jobs, 
 
 const sessionMessageListeners = new Map<string, Set<(msg: UserMessageObservation) => void>>()
 
-export function notifySessionUserMessage(sessionID: string, msg: UserMessageObservation) {
+function notifySessionUserMessage(sessionID: string, msg: UserMessageObservation) {
   const listeners = sessionMessageListeners.get(sessionID)
   if (listeners) {
     for (const listener of listeners) {
@@ -16,7 +16,7 @@ export function notifySessionUserMessage(sessionID: string, msg: UserMessageObse
   }
 }
 
-export function subscribeSessionUserMessage(sessionID: string, callback: (msg: UserMessageObservation) => void): () => void {
+function subscribeSessionUserMessage(sessionID: string, callback: (msg: UserMessageObservation) => void): () => void {
   let set = sessionMessageListeners.get(sessionID)
   if (!set) {
     set = new Set()
